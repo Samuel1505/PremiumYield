@@ -1,9 +1,6 @@
 # PremiumYield Hook
 
 > **IL Insurance Fund Where the Premiums Earn Yield**
->
-> UHI9 Hookathon Submission · Uniswap Hook Incubator Cohort 9 · May 25, 2026
-
 ---
 
 ## Overview
