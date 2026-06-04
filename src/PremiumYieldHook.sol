@@ -60,18 +60,9 @@ contract PremiumYieldHook is IHooks {
         uint8 volatilityRegime
     );
     event ClaimProcessed(
-        bytes32 indexed positionId,
-        address indexed lp,
-        uint256 ilBps,
-        uint256 thresholdBps,
-        uint256 payoutAmount
+        bytes32 indexed positionId, address indexed lp, uint256 ilBps, uint256 thresholdBps, uint256 payoutAmount
     );
-    event PremiumReturned(
-        bytes32 indexed positionId,
-        address indexed lp,
-        uint256 premiumReturned,
-        uint256 yieldEarned
-    );
+    event PremiumReturned(bytes32 indexed positionId, address indexed lp, uint256 premiumReturned, uint256 yieldEarned);
     event SolvencyWarning(bytes32 indexed poolId, uint256 solvencyRatioBps);
     event PoolVaultSet(bytes32 indexed poolId, address vault);
     event DepositsPausedEvent(bytes32 indexed poolId);
@@ -190,8 +181,7 @@ contract PremiumYieldHook is IHooks {
     ) external override onlyPoolManager returns (bytes4) {
         if (hookData.length == 0) return IHooks.beforeAddLiquidity.selector;
 
-        (uint256 coverageThresholdBps, bool wantsInsurance, address lp) =
-            abi.decode(hookData, (uint256, bool, address));
+        (uint256 coverageThresholdBps, bool wantsInsurance, address lp) = abi.decode(hookData, (uint256, bool, address));
         if (!wantsInsurance) return IHooks.beforeAddLiquidity.selector;
 
         if (coverageThresholdBps < MIN_COVERAGE_BPS || coverageThresholdBps > MAX_COVERAGE_BPS) {
@@ -320,7 +310,9 @@ contract PremiumYieldHook is IHooks {
         // ── Update coverage liability ─────────────────────────────────────
         uint256 liabilityReduction = _maxCoverageAmount(notional, coverageThresholdBps);
         if (totalCoverageLiability[pid] >= liabilityReduction) {
-            unchecked { totalCoverageLiability[pid] -= liabilityReduction; }
+            unchecked {
+                totalCoverageLiability[pid] -= liabilityReduction;
+            }
         } else {
             totalCoverageLiability[pid] = 0;
         }
@@ -341,10 +333,7 @@ contract PremiumYieldHook is IHooks {
         // 3. Settle — credits hook's delta with +transferAmount
         poolManager.settle();
         // 4. Return negative delta — hook's credit is consumed, LP's callerDelta gains +transferAmount
-        return (
-            IHooks.afterRemoveLiquidity.selector,
-            toBalanceDelta(-int128(int256(transferAmount)), 0)
-        );
+        return (IHooks.afterRemoveLiquidity.selector, toBalanceDelta(-int128(int256(transferAmount)), 0));
     }
 
     // ── View helpers ──────────────────────────────────────────────────────
@@ -376,55 +365,67 @@ contract PremiumYieldHook is IHooks {
         revert HookNotImplemented();
     }
 
-    function beforeRemoveLiquidity(
-        address,
-        PoolKey calldata,
-        ModifyLiquidityParams calldata,
-        bytes calldata
-    ) external pure override returns (bytes4) {
+    function beforeRemoveLiquidity(address, PoolKey calldata, ModifyLiquidityParams calldata, bytes calldata)
+        external
+        pure
+        override
+        returns (bytes4)
+    {
         revert HookNotImplemented();
     }
 
-    function beforeSwap(
-        address,
-        PoolKey calldata,
-        SwapParams calldata,
-        bytes calldata
-    ) external pure override returns (bytes4, BeforeSwapDelta, uint24) {
+    function beforeSwap(address, PoolKey calldata, SwapParams calldata, bytes calldata)
+        external
+        pure
+        override
+        returns (bytes4, BeforeSwapDelta, uint24)
+    {
         revert HookNotImplemented();
     }
 
-    function afterSwap(
-        address,
-        PoolKey calldata,
-        SwapParams calldata,
-        BalanceDelta,
-        bytes calldata
-    ) external pure override returns (bytes4, int128) {
+    function afterSwap(address, PoolKey calldata, SwapParams calldata, BalanceDelta, bytes calldata)
+        external
+        pure
+        override
+        returns (bytes4, int128)
+    {
         revert HookNotImplemented();
     }
 
     function beforeDonate(address, PoolKey calldata, uint256, uint256, bytes calldata)
-        external pure override returns (bytes4) { revert HookNotImplemented(); }
+        external
+        pure
+        override
+        returns (bytes4)
+    {
+        revert HookNotImplemented();
+    }
 
     function afterDonate(address, PoolKey calldata, uint256, uint256, bytes calldata)
-        external pure override returns (bytes4) { revert HookNotImplemented(); }
+        external
+        pure
+        override
+        returns (bytes4)
+    {
+        revert HookNotImplemented();
+    }
 
     // ── Internal helpers ──────────────────────────────────────────────────
 
-    function _positionId(
-        address lpOwner,
-        PoolKey calldata key,
-        ModifyLiquidityParams calldata params
-    ) internal pure returns (bytes32) {
+    function _positionId(address lpOwner, PoolKey calldata key, ModifyLiquidityParams calldata params)
+        internal
+        pure
+        returns (bytes32)
+    {
         return keccak256(abi.encode(lpOwner, key.toId(), params.tickLower, params.tickUpper, params.salt));
     }
 
     /// @dev notional ≈ liquidity * Q96 / sqrtPriceX96 in currency0 terms
-    function _estimateNotional(
-        ModifyLiquidityParams calldata params,
-        PoolKey calldata key
-    ) internal view returns (uint256) {
+    function _estimateNotional(ModifyLiquidityParams calldata params, PoolKey calldata key)
+        internal
+        view
+        returns (uint256)
+    {
         (uint160 sqrtPriceX96,,,) = poolManager.getSlot0(key.toId());
         if (sqrtPriceX96 == 0) return 0;
         uint256 liquidity = params.liquidityDelta > 0
@@ -443,11 +444,11 @@ contract PremiumYieldHook is IHooks {
     }
 
     /// @dev Payout = (ilBps - thresholdBps) * positionValue / BPS
-    function _calculatePayout(
-        uint256 ilBps,
-        uint256 thresholdBps,
-        uint256 positionValue
-    ) internal pure returns (uint256) {
+    function _calculatePayout(uint256 ilBps, uint256 thresholdBps, uint256 positionValue)
+        internal
+        pure
+        returns (uint256)
+    {
         if (ilBps <= thresholdBps) return 0;
         return FullMath.mulDiv(ilBps - thresholdBps, positionValue, BPS);
     }
@@ -467,10 +468,9 @@ contract PremiumYieldHook is IHooks {
 
     /// @dev Wraps oracle call with try/catch — falls back to Normal regime on failure (FR-5)
     function _safeGetRegime(PoolKey calldata key) internal view returns (uint8) {
-        try volOracle.getCurrentRegime(
-            Currency.unwrap(key.currency0),
-            Currency.unwrap(key.currency1)
-        ) returns (uint8 regime) {
+        try volOracle.getCurrentRegime(Currency.unwrap(key.currency0), Currency.unwrap(key.currency1)) returns (
+            uint8 regime
+        ) {
             return regime;
         } catch {
             return 1; // Normal regime fallback
