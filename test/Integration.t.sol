@@ -38,8 +38,7 @@ contract IntegrationTest is Test {
     // ── Addresses ─────────────────────────────────────────────────────────
     // Required hook flags: BEFORE_ADD_LIQUIDITY | AFTER_REMOVE_LIQUIDITY | AFTER_REMOVE_LIQUIDITY_RETURNS_DELTA
     uint160 constant HOOK_FLAGS = uint160(
-        Hooks.BEFORE_ADD_LIQUIDITY_FLAG
-            | Hooks.AFTER_REMOVE_LIQUIDITY_FLAG
+        Hooks.BEFORE_ADD_LIQUIDITY_FLAG | Hooks.AFTER_REMOVE_LIQUIDITY_FLAG
             | Hooks.AFTER_REMOVE_LIQUIDITY_RETURNS_DELTA_FLAG
     );
 
@@ -119,9 +118,9 @@ contract IntegrationTest is Test {
 
         // 9. Seed actors with tokens (large amounts — liquidity adds consume ~notional in token0/1)
         token0.mint(alice, 100_000_000e18);
-        token0.mint(bob,   100_000_000e18);
+        token0.mint(bob, 100_000_000e18);
         token1.mint(alice, 100_000_000e18);
-        token1.mint(bob,   100_000_000e18);
+        token1.mint(bob, 100_000_000e18);
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────
@@ -136,10 +135,7 @@ contract IntegrationTest is Test {
         token0.approve(address(hook), type(uint256).max);
 
         ModifyLiquidityParams memory params = ModifyLiquidityParams({
-            tickLower: TICK_LOWER,
-            tickUpper: TICK_UPPER,
-            liquidityDelta: liquidityDelta,
-            salt: bytes32(0)
+            tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: liquidityDelta, salt: bytes32(0)
         });
         // Include LP address so the hook can pull premium from the right wallet
         bytes memory hookData = abi.encode(thresholdBps, true, actor);
@@ -153,10 +149,7 @@ contract IntegrationTest is Test {
     function _removeLiquidity(address actor, int256 liquidityDelta) internal {
         vm.startPrank(actor);
         ModifyLiquidityParams memory params = ModifyLiquidityParams({
-            tickLower: TICK_LOWER,
-            tickUpper: TICK_UPPER,
-            liquidityDelta: liquidityDelta,
-            salt: bytes32(0)
+            tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: liquidityDelta, salt: bytes32(0)
         });
         // Pass LP address so hook can find and settle the insured position
         liquidityRouter.modifyLiquidity(poolKey, params, abi.encode(actor));
@@ -174,15 +167,10 @@ contract IntegrationTest is Test {
         token1.approve(address(swapRouter), type(uint256).max);
 
         uint160 sqrtLimit = zeroForOne ? TickMath.MIN_SQRT_PRICE + 1 : TickMath.MAX_SQRT_PRICE - 1;
-        SwapParams memory params = SwapParams({
-            zeroForOne: zeroForOne,
-            amountSpecified: amountSpecified,
-            sqrtPriceLimitX96: sqrtLimit
-        });
-        PoolSwapTest.TestSettings memory settings = PoolSwapTest.TestSettings({
-            takeClaims: false,
-            settleUsingBurn: false
-        });
+        SwapParams memory params =
+            SwapParams({zeroForOne: zeroForOne, amountSpecified: amountSpecified, sqrtPriceLimitX96: sqrtLimit});
+        PoolSwapTest.TestSettings memory settings =
+            PoolSwapTest.TestSettings({takeClaims: false, settleUsingBurn: false});
         swapRouter.swap(poolKey, params, settings, bytes(""));
         vm.stopPrank();
     }
@@ -200,7 +188,7 @@ contract IntegrationTest is Test {
 
         // Verify position was recorded
         bytes32 posId = keccak256(abi.encode(alice, poolKey.toId(), TICK_LOWER, TICK_UPPER, bytes32(0)));
-        (,,,,,uint256 premiumPaid,, bool active) = hook.positions(posId);
+        (,,,,, uint256 premiumPaid,, bool active) = hook.positions(posId);
         assertTrue(active, "position should be active");
         assertGt(premiumPaid, 0, "premium paid should be > 0");
     }
@@ -214,10 +202,7 @@ contract IntegrationTest is Test {
         token1.approve(address(liquidityRouter), type(uint256).max);
 
         ModifyLiquidityParams memory params = ModifyLiquidityParams({
-            tickLower: TICK_LOWER,
-            tickUpper: TICK_UPPER,
-            liquidityDelta: LIQUIDITY,
-            salt: bytes32(0)
+            tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: LIQUIDITY, salt: bytes32(0)
         });
         bytes memory hookData = abi.encode(uint256(300), false, alice); // wantsInsurance = false
         liquidityRouter.modifyLiquidity(poolKey, params, hookData);
@@ -255,9 +240,7 @@ contract IntegrationTest is Test {
         token0.approve(address(liquidityRouter), type(uint256).max);
         token1.approve(address(liquidityRouter), type(uint256).max);
         liquidityRouter.modifyLiquidity(
-            poolKey,
-            ModifyLiquidityParams(TICK_LOWER, TICK_UPPER, LIQUIDITY * 10, bytes32(0)),
-            bytes("")
+            poolKey, ModifyLiquidityParams(TICK_LOWER, TICK_UPPER, LIQUIDITY * 10, bytes32(0)), bytes("")
         );
         vm.stopPrank();
 
@@ -337,10 +320,7 @@ contract IntegrationTest is Test {
         token0.approve(address(hook), type(uint256).max);
 
         ModifyLiquidityParams memory params = ModifyLiquidityParams({
-            tickLower: TICK_LOWER,
-            tickUpper: TICK_UPPER,
-            liquidityDelta: LIQUIDITY,
-            salt: bytes32(0)
+            tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: LIQUIDITY, salt: bytes32(0)
         });
         // DepositsPaused is wrapped by PoolManager — catch any revert
         vm.expectRevert();
@@ -361,10 +341,7 @@ contract IntegrationTest is Test {
         token0.approve(address(hook), type(uint256).max);
 
         ModifyLiquidityParams memory params = ModifyLiquidityParams({
-            tickLower: TICK_LOWER,
-            tickUpper: TICK_UPPER,
-            liquidityDelta: LIQUIDITY,
-            salt: bytes32(0)
+            tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: LIQUIDITY, salt: bytes32(0)
         });
 
         // Threshold = 0 (below MIN_COVERAGE_BPS = 1) — error is wrapped by PoolManager
@@ -417,10 +394,7 @@ contract IntegrationTest is Test {
         tokenX.approve(address(hook), type(uint256).max);
 
         ModifyLiquidityParams memory params = ModifyLiquidityParams({
-            tickLower: TICK_LOWER,
-            tickUpper: TICK_UPPER,
-            liquidityDelta: LIQUIDITY,
-            salt: bytes32(0)
+            tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: LIQUIDITY, salt: bytes32(0)
         });
         // VaultNotSet is wrapped by PoolManager — catch any revert
         vm.expectRevert();
