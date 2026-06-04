@@ -30,8 +30,7 @@ contract DeployScript is Script {
 
     // Hook flag combination required in the deployed address
     uint160 constant HOOK_FLAGS = uint160(
-        Hooks.BEFORE_ADD_LIQUIDITY_FLAG
-            | Hooks.AFTER_REMOVE_LIQUIDITY_FLAG
+        Hooks.BEFORE_ADD_LIQUIDITY_FLAG | Hooks.AFTER_REMOVE_LIQUIDITY_FLAG
             | Hooks.AFTER_REMOVE_LIQUIDITY_RETURNS_DELTA_FLAG
     );
 
@@ -57,10 +56,8 @@ contract DeployScript is Script {
 
         // 3. Deploy hook at the mined address using CREATE2
         bytes32 salt = _findSalt(poolManagerAddr, address(volOracle));
-        PremiumYieldHook hookImpl = new PremiumYieldHook{salt: salt}(
-            IPoolManager(poolManagerAddr),
-            IVolatilityOracle(address(volOracle))
-        );
+        PremiumYieldHook hookImpl =
+            new PremiumYieldHook{salt: salt}(IPoolManager(poolManagerAddr), IVolatilityOracle(address(volOracle)));
         require(address(hookImpl) == hookAddress, "Hook deployed at wrong address");
         console2.log("PremiumYieldHook deployed at:", address(hookImpl));
 
@@ -94,8 +91,7 @@ contract DeployScript is Script {
     function _mineHookAddress(address pm, address oracle) internal view returns (address) {
         bytes32 initCodeHash = keccak256(
             abi.encodePacked(
-                type(PremiumYieldHook).creationCode,
-                abi.encode(IPoolManager(pm), IVolatilityOracle(oracle))
+                type(PremiumYieldHook).creationCode, abi.encode(IPoolManager(pm), IVolatilityOracle(oracle))
             )
         );
         for (uint256 salt = 0; salt < 160_000; salt++) {
@@ -110,8 +106,7 @@ contract DeployScript is Script {
     function _findSalt(address pm, address oracle) internal view returns (bytes32) {
         bytes32 initCodeHash = keccak256(
             abi.encodePacked(
-                type(PremiumYieldHook).creationCode,
-                abi.encode(IPoolManager(pm), IVolatilityOracle(oracle))
+                type(PremiumYieldHook).creationCode, abi.encode(IPoolManager(pm), IVolatilityOracle(oracle))
             )
         );
         for (uint256 salt = 0; salt < 160_000; salt++) {
@@ -124,12 +119,6 @@ contract DeployScript is Script {
     }
 
     function _computeCreate2Address(bytes32 salt, bytes32 initCodeHash) internal view returns (address) {
-        return address(
-            uint160(
-                uint256(
-                    keccak256(abi.encodePacked(bytes1(0xff), address(this), salt, initCodeHash))
-                )
-            )
-        );
+        return address(uint160(uint256(keccak256(abi.encodePacked(bytes1(0xff), address(this), salt, initCodeHash)))));
     }
 }
