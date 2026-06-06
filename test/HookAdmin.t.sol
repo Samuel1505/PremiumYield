@@ -98,8 +98,9 @@ contract HookAdminTest is Test {
         token0.approve(address(liquidityRouter), type(uint256).max);
         token1.approve(address(liquidityRouter), type(uint256).max);
         token0.approve(address(hook), type(uint256).max);
-        ModifyLiquidityParams memory params =
-            ModifyLiquidityParams({tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: liquidityDelta, salt: bytes32(0)});
+        ModifyLiquidityParams memory params = ModifyLiquidityParams({
+            tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: liquidityDelta, salt: bytes32(0)
+        });
         liquidityRouter.modifyLiquidity(poolKey, params, abi.encode(thresholdBps, true, actor));
         vm.stopPrank();
     }
@@ -267,15 +268,17 @@ contract HookAdminTest is Test {
     // ── onlyPoolManager guard ─────────────────────────────────────────────────
 
     function test_directCall_beforeAddLiquidity_reverts() public {
-        ModifyLiquidityParams memory params =
-            ModifyLiquidityParams({tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: LIQUIDITY, salt: bytes32(0)});
+        ModifyLiquidityParams memory params = ModifyLiquidityParams({
+            tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: LIQUIDITY, salt: bytes32(0)
+        });
         vm.expectRevert(PremiumYieldHook.NotPoolManager.selector);
         hook.beforeAddLiquidity(alice, poolKey, params, bytes(""));
     }
 
     function test_directCall_afterRemoveLiquidity_reverts() public {
-        ModifyLiquidityParams memory params =
-            ModifyLiquidityParams({tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: -LIQUIDITY, salt: bytes32(0)});
+        ModifyLiquidityParams memory params = ModifyLiquidityParams({
+            tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: -LIQUIDITY, salt: bytes32(0)
+        });
         vm.expectRevert(PremiumYieldHook.NotPoolManager.selector);
         hook.afterRemoveLiquidity(alice, poolKey, params, BalanceDelta.wrap(0), BalanceDelta.wrap(0), bytes(""));
     }

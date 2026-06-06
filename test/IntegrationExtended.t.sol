@@ -112,16 +112,18 @@ contract IntegrationExtendedTest is Test {
         token0.approve(address(liquidityRouter), type(uint256).max);
         token1.approve(address(liquidityRouter), type(uint256).max);
         token0.approve(address(hook), type(uint256).max);
-        ModifyLiquidityParams memory params =
-            ModifyLiquidityParams({tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: liquidityDelta, salt: bytes32(0)});
+        ModifyLiquidityParams memory params = ModifyLiquidityParams({
+            tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: liquidityDelta, salt: bytes32(0)
+        });
         liquidityRouter.modifyLiquidity(poolKey, params, abi.encode(thresholdBps, true, actor));
         vm.stopPrank();
     }
 
     function _removeLiquidity(address actor, int256 liquidityDelta) internal {
         vm.startPrank(actor);
-        ModifyLiquidityParams memory params =
-            ModifyLiquidityParams({tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: liquidityDelta, salt: bytes32(0)});
+        ModifyLiquidityParams memory params = ModifyLiquidityParams({
+            tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: liquidityDelta, salt: bytes32(0)
+        });
         liquidityRouter.modifyLiquidity(poolKey, params, abi.encode(actor));
         vm.stopPrank();
     }
@@ -266,8 +268,9 @@ contract IntegrationExtendedTest is Test {
         token0.approve(address(liquidityRouter), type(uint256).max);
         token1.approve(address(liquidityRouter), type(uint256).max);
         token0.approve(address(hook), type(uint256).max);
-        ModifyLiquidityParams memory params =
-            ModifyLiquidityParams({tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: LIQUIDITY, salt: bytes32(uint256(1))});
+        ModifyLiquidityParams memory params = ModifyLiquidityParams({
+            tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: LIQUIDITY, salt: bytes32(uint256(1))
+        });
         liquidityRouter.modifyLiquidity(poolKey, params, abi.encode(uint256(300), true, alice));
         vm.stopPrank();
 
@@ -396,8 +399,9 @@ contract IntegrationExtendedTest is Test {
         vm.startPrank(alice);
         token0.approve(address(liquidityRouter), type(uint256).max);
         token1.approve(address(liquidityRouter), type(uint256).max);
-        ModifyLiquidityParams memory params =
-            ModifyLiquidityParams({tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: LIQUIDITY, salt: bytes32(0)});
+        ModifyLiquidityParams memory params = ModifyLiquidityParams({
+            tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: LIQUIDITY, salt: bytes32(0)
+        });
         liquidityRouter.modifyLiquidity(poolKey, params, abi.encode(uint256(300), false, alice));
         vm.stopPrank();
 
@@ -429,7 +433,9 @@ contract IntegrationExtendedTest is Test {
         vm.startPrank(alice);
         liquidityRouter.modifyLiquidity(
             poolKey,
-            ModifyLiquidityParams({tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: LIQUIDITY, salt: bytes32(0)}),
+            ModifyLiquidityParams({
+                tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: LIQUIDITY, salt: bytes32(0)
+            }),
             abi.encode(uint256(300), true, alice)
         );
         vm.stopPrank();
@@ -701,8 +707,9 @@ contract IntegrationExtendedTest is Test {
         token0.approve(address(liquidityRouter), type(uint256).max);
         token1.approve(address(liquidityRouter), type(uint256).max);
         token0.approve(address(hook), type(uint256).max);
-        ModifyLiquidityParams memory params =
-            ModifyLiquidityParams({tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: LIQUIDITY, salt: bytes32(0)});
+        ModifyLiquidityParams memory params = ModifyLiquidityParams({
+            tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: LIQUIDITY, salt: bytes32(0)
+        });
         vm.expectRevert();
         liquidityRouter.modifyLiquidity(poolKey, params, abi.encode(uint256(0), true, alice));
         vm.stopPrank();
@@ -713,8 +720,9 @@ contract IntegrationExtendedTest is Test {
         token0.approve(address(liquidityRouter), type(uint256).max);
         token1.approve(address(liquidityRouter), type(uint256).max);
         token0.approve(address(hook), type(uint256).max);
-        ModifyLiquidityParams memory params =
-            ModifyLiquidityParams({tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: LIQUIDITY, salt: bytes32(0)});
+        ModifyLiquidityParams memory params = ModifyLiquidityParams({
+            tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: LIQUIDITY, salt: bytes32(0)
+        });
         vm.expectRevert();
         liquidityRouter.modifyLiquidity(poolKey, params, abi.encode(uint256(5001), true, alice));
         vm.stopPrank();
@@ -725,8 +733,9 @@ contract IntegrationExtendedTest is Test {
         vm.startPrank(alice);
         token0.approve(address(liquidityRouter), type(uint256).max);
         token1.approve(address(liquidityRouter), type(uint256).max);
-        ModifyLiquidityParams memory params =
-            ModifyLiquidityParams({tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: LIQUIDITY, salt: bytes32(0)});
+        ModifyLiquidityParams memory params = ModifyLiquidityParams({
+            tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: LIQUIDITY, salt: bytes32(0)
+        });
         liquidityRouter.modifyLiquidity(poolKey, params, bytes(""));
         vm.stopPrank();
 
@@ -755,8 +764,9 @@ contract IntegrationExtendedTest is Test {
         token0.approve(address(liquidityRouter), type(uint256).max);
         token1.approve(address(liquidityRouter), type(uint256).max);
         // Deliberately NOT approving hook for token0 premium
-        ModifyLiquidityParams memory params =
-            ModifyLiquidityParams({tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: LIQUIDITY, salt: bytes32(0)});
+        ModifyLiquidityParams memory params = ModifyLiquidityParams({
+            tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: LIQUIDITY, salt: bytes32(0)
+        });
         vm.expectRevert();
         liquidityRouter.modifyLiquidity(poolKey, params, abi.encode(uint256(300), true, alice));
         vm.stopPrank();
@@ -767,8 +777,9 @@ contract IntegrationExtendedTest is Test {
         vm.startPrank(alice);
         token0.approve(address(liquidityRouter), type(uint256).max);
         token1.approve(address(liquidityRouter), type(uint256).max);
-        ModifyLiquidityParams memory params =
-            ModifyLiquidityParams({tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: LIQUIDITY, salt: bytes32(0)});
+        ModifyLiquidityParams memory params = ModifyLiquidityParams({
+            tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: LIQUIDITY, salt: bytes32(0)
+        });
         liquidityRouter.modifyLiquidity(poolKey, params, abi.encode(uint256(300), false, alice));
         vm.stopPrank();
         assertEq(vault.totalAssets(), vaultBefore);
@@ -797,7 +808,9 @@ contract IntegrationExtendedTest is Test {
         tx0.approve(address(hook), type(uint256).max);
         vm.expectRevert();
         liquidityRouter.modifyLiquidity(
-            newKey, ModifyLiquidityParams(TICK_LOWER, TICK_UPPER, LIQUIDITY, bytes32(0)), abi.encode(uint256(300), true, alice)
+            newKey,
+            ModifyLiquidityParams(TICK_LOWER, TICK_UPPER, LIQUIDITY, bytes32(0)),
+            abi.encode(uint256(300), true, alice)
         );
         vm.stopPrank();
     }
@@ -807,8 +820,9 @@ contract IntegrationExtendedTest is Test {
 
         // Remove using Bob's address as the LP in hookData — hook looks up Bob's (non-existent) position
         vm.startPrank(alice);
-        ModifyLiquidityParams memory params =
-            ModifyLiquidityParams({tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: -LIQUIDITY, salt: bytes32(0)});
+        ModifyLiquidityParams memory params = ModifyLiquidityParams({
+            tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: -LIQUIDITY, salt: bytes32(0)
+        });
         liquidityRouter.modifyLiquidity(poolKey, params, abi.encode(bob)); // wrong LP address
         vm.stopPrank();
 
@@ -834,8 +848,9 @@ contract IntegrationExtendedTest is Test {
         token0.approve(address(liquidityRouter), type(uint256).max);
         token1.approve(address(liquidityRouter), type(uint256).max);
         token0.approve(address(hook), type(uint256).max);
-        ModifyLiquidityParams memory params =
-            ModifyLiquidityParams({tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: LIQUIDITY, salt: bytes32(0)});
+        ModifyLiquidityParams memory params = ModifyLiquidityParams({
+            tickLower: TICK_LOWER, tickUpper: TICK_UPPER, liquidityDelta: LIQUIDITY, salt: bytes32(0)
+        });
         vm.expectRevert();
         liquidityRouter.modifyLiquidity(poolKey, params, abi.encode(uint256(threshold), true, alice));
         vm.stopPrank();
